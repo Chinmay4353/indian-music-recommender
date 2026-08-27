@@ -1,0 +1,2431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Indian Music Recommender</title>
+
+
+    <style>
+
+        /* =====================================================
+           RESET
+           ===================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        body {
+            margin: 0;
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background: #f5f7fb;
+
+            color: #172033;
+
+            line-height: 1.5;
+        }
+
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+
+        button {
+            cursor: pointer;
+        }
+
+
+        /* =====================================================
+           HERO
+           ===================================================== */
+
+        .hero {
+            background:
+                linear-gradient(
+                    135deg,
+                    #5b21b6,
+                    #7c3aed,
+                    #a855f7
+                );
+
+            color: white;
+
+            padding: 72px 24px 76px;
+        }
+
+
+        .hero-inner {
+            max-width: 1200px;
+
+            margin: 0 auto;
+        }
+
+
+        .hero-badge {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 7px 12px;
+
+            margin-bottom: 18px;
+
+            border-radius: 999px;
+
+            background: rgba(
+                255,
+                255,
+                255,
+                0.16
+            );
+
+            font-size: 13px;
+
+            font-weight: 700;
+        }
+
+
+        .hero h1 {
+            margin: 0;
+
+            font-size: clamp(
+                38px,
+                6vw,
+                64px
+            );
+
+            line-height: 1.05;
+
+            letter-spacing: -1.5px;
+        }
+
+
+        .hero p {
+            max-width: 650px;
+
+            margin: 18px 0 0;
+
+            font-size: 19px;
+
+            color: rgba(
+                255,
+                255,
+                255,
+                0.88
+            );
+        }
+
+
+        /* =====================================================
+           MAIN
+           ===================================================== */
+
+        .container {
+            width: min(
+                1200px,
+                calc(100% - 32px)
+            );
+
+            margin: 0 auto;
+
+            padding: 38px 0 70px;
+        }
+
+
+        /* =====================================================
+           SEARCH PANEL
+           ===================================================== */
+
+        .search-panel,
+        .filter-panel {
+            background: white;
+
+            border-radius: 22px;
+
+            padding: 30px;
+
+            box-shadow:
+                0 10px 35px
+                rgba(
+                    15,
+                    23,
+                    42,
+                    0.07
+                );
+
+            border: 1px solid #edf0f5;
+
+            margin-bottom: 28px;
+        }
+
+
+        .section-heading {
+            margin-bottom: 20px;
+        }
+
+
+        .section-heading h2 {
+            margin: 0;
+
+            font-size: 27px;
+
+            letter-spacing: -0.5px;
+        }
+
+
+        .section-heading p {
+            margin: 7px 0 0;
+
+            color: #64748b;
+
+            font-size: 15px;
+        }
+
+
+        /* =====================================================
+           SEARCH BAR
+           ===================================================== */
+
+        .search-row {
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1fr)
+                auto;
+
+            gap: 12px;
+        }
+
+
+        .search-input {
+            width: 100%;
+
+            height: 56px;
+
+            padding: 0 18px;
+
+            border: 2px solid #e2e8f0;
+
+            border-radius: 14px;
+
+            outline: none;
+
+            color: #172033;
+
+            background: white;
+
+            transition:
+                border-color 0.2s,
+                box-shadow 0.2s;
+        }
+
+
+        .search-input:focus {
+            border-color: #7c3aed;
+
+            box-shadow:
+                0 0 0 4px
+                rgba(
+                    124,
+                    58,
+                    237,
+                    0.10
+                );
+        }
+
+
+        .primary-button {
+            height: 56px;
+
+            padding: 0 27px;
+
+            border: none;
+
+            border-radius: 14px;
+
+            background: #7c3aed;
+
+            color: white;
+
+            font-weight: 800;
+
+            transition:
+                transform 0.15s,
+                background 0.15s;
+        }
+
+
+        .primary-button:hover {
+            background: #6d28d9;
+
+            transform: translateY(-1px);
+        }
+
+
+        .primary-button:disabled {
+            opacity: 0.6;
+
+            cursor: not-allowed;
+
+            transform: none;
+        }
+
+
+        .search-helper {
+            margin-top: 12px;
+
+            color: #64748b;
+
+            font-size: 14px;
+        }
+
+
+        /* =====================================================
+           FILTER PANEL
+           ===================================================== */
+
+        .filter-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 18px;
+        }
+
+
+        .filter-field label {
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-size: 14px;
+
+            font-weight: 800;
+
+            color: #334155;
+        }
+
+
+        .filter-field select {
+            width: 100%;
+
+            height: 52px;
+
+            padding: 0 14px;
+
+            border: 2px solid #e2e8f0;
+
+            border-radius: 13px;
+
+            background: white;
+
+            color: #172033;
+
+            outline: none;
+        }
+
+
+        .filter-field select:focus {
+            border-color: #7c3aed;
+        }
+
+
+        .filter-actions {
+            display: flex;
+
+            justify-content: flex-end;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin-top: 22px;
+
+            padding-top: 20px;
+
+            border-top: 1px solid #edf0f5;
+        }
+
+
+        .secondary-button {
+            height: 50px;
+
+            padding: 0 20px;
+
+            border-radius: 13px;
+
+            border: 1px solid #dbe1ea;
+
+            background: white;
+
+            color: #334155;
+
+            font-weight: 750;
+        }
+
+
+        .secondary-button:hover {
+            background: #f8fafc;
+        }
+
+
+        .filter-button {
+            height: 50px;
+
+            padding: 0 24px;
+
+            border: none;
+
+            border-radius: 13px;
+
+            background: #7c3aed;
+
+            color: white;
+
+            font-weight: 800;
+        }
+
+
+        .filter-button:hover {
+            background: #6d28d9;
+        }
+
+
+        /* =====================================================
+           RESULTS HEADER
+           ===================================================== */
+
+        .results-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 16px;
+
+            margin: 42px 0 20px;
+        }
+
+
+        .results-title {
+            margin: 0;
+
+            font-size: 30px;
+
+            letter-spacing: -0.6px;
+        }
+
+
+        .results-count {
+            flex-shrink: 0;
+
+            padding: 8px 14px;
+
+            border-radius: 999px;
+
+            background: #f0e9ff;
+
+            color: #6d28d9;
+
+            font-weight: 800;
+
+            font-size: 14px;
+        }
+
+
+        /* =====================================================
+           RESULTS GRID
+           ===================================================== */
+
+        .results-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 24px;
+        }
+
+
+        /* =====================================================
+           SONG CARD
+           ===================================================== */
+
+        .song-card {
+            overflow: hidden;
+
+            background: white;
+
+            border-radius: 20px;
+
+            border: 1px solid #edf0f5;
+
+            box-shadow:
+                0 8px 25px
+                rgba(
+                    15,
+                    23,
+                    42,
+                    0.06
+                );
+
+            transition:
+                transform 0.2s,
+                box-shadow 0.2s;
+        }
+
+
+        .song-card:hover {
+            transform: translateY(-4px);
+
+            box-shadow:
+                0 15px 35px
+                rgba(
+                    15,
+                    23,
+                    42,
+                    0.11
+                );
+        }
+
+
+        /* =====================================================
+           COVER
+           ===================================================== */
+
+        .song-cover-wrapper {
+            aspect-ratio: 1 / 1;
+
+            overflow: hidden;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #6d28d9,
+                    #db2777
+                );
+        }
+
+
+        .song-cover {
+            width: 100%;
+
+            height: 100%;
+
+            display: block;
+
+            object-fit: cover;
+        }
+
+
+        /* =====================================================
+           SONG INFORMATION
+           ===================================================== */
+
+        .song-info {
+            padding: 20px;
+        }
+
+
+        .song-title {
+            margin: 0;
+
+            font-size: 20px;
+
+            line-height: 1.3;
+
+            letter-spacing: -0.3px;
+
+            display: -webkit-box;
+
+            -webkit-line-clamp: 2;
+
+            -webkit-box-orient: vertical;
+
+            overflow: hidden;
+        }
+
+
+        .artist {
+            margin: 8px 0 0;
+
+            color: #64748b;
+
+            font-size: 14px;
+
+            font-weight: 600;
+        }
+
+
+        .album-name {
+            margin: 5px 0 0;
+
+            color: #94a3b8;
+
+            font-size: 13px;
+        }
+
+
+        /* =====================================================
+           TAGS
+           ===================================================== */
+
+        .tags {
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 7px;
+
+            margin-top: 15px;
+        }
+
+
+        .tag {
+            display: inline-flex;
+
+            align-items: center;
+
+            min-height: 29px;
+
+            padding: 4px 9px;
+
+            border-radius: 8px;
+
+            background: #f1f5f9;
+
+            color: #475569;
+
+            font-size: 12px;
+
+            font-weight: 800;
+        }
+
+
+        /* =====================================================
+           META
+           ===================================================== */
+
+        .song-meta {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-top: 17px;
+
+            padding-top: 15px;
+
+            border-top: 1px solid #edf0f5;
+
+            color: #64748b;
+
+            font-size: 13px;
+        }
+
+
+        .similarity-value strong {
+            color: #6d28d9;
+
+            font-size: 14px;
+        }
+
+
+        /* =====================================================
+           SONG ACTIONS
+           ===================================================== */
+
+        .song-actions {
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 9px;
+
+            margin-top: 17px;
+        }
+
+
+        .song-action {
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 7px;
+
+            min-height: 40px;
+
+            padding: 0 13px;
+
+            border-radius: 10px;
+
+            text-decoration: none;
+
+            font-size: 13px;
+
+            font-weight: 800;
+
+            transition:
+                transform 0.15s,
+                opacity 0.15s;
+        }
+
+
+        .song-action:hover {
+            transform: translateY(-1px);
+
+            opacity: 0.9;
+        }
+
+
+        .action-icon {
+            font-size: 14px;
+
+            line-height: 1;
+        }
+
+
+        .spotify-button {
+            background: #ecfdf5;
+
+            color: #047857;
+        }
+
+
+        .youtube-button {
+            background: #fef2f2;
+
+            color: #b91c1c;
+        }
+
+
+        .search-button {
+            background: #f5f3ff;
+
+            color: #6d28d9;
+        }
+
+
+        /* =====================================================
+           STATES
+           ===================================================== */
+
+        .state {
+            padding: 70px 25px;
+
+            text-align: center;
+
+            background: white;
+
+            border-radius: 20px;
+
+            border: 1px solid #edf0f5;
+        }
+
+
+        .state-icon {
+            font-size: 44px;
+
+            margin-bottom: 12px;
+        }
+
+
+        .state h3 {
+            margin: 0;
+
+            font-size: 22px;
+        }
+
+
+        .state p {
+            margin: 8px auto 0;
+
+            max-width: 560px;
+
+            color: #64748b;
+        }
+
+
+        .hidden {
+            display: none !important;
+        }
+
+
+        /* =====================================================
+           FOOTER
+           ===================================================== */
+
+        footer {
+            padding: 30px 20px 45px;
+
+            text-align: center;
+
+            color: #64748b;
+
+            font-size: 14px;
+        }
+
+
+        footer strong {
+            color: #475569;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 950px) {
+
+            .results-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .filter-grid {
+                grid-template-columns:
+                    1fr;
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .hero {
+                padding:
+                    48px
+                    20px
+                    55px;
+            }
+
+
+            .container {
+                width:
+                    min(
+                        100% - 20px,
+                        1200px
+                    );
+
+                padding-top: 22px;
+            }
+
+
+            .search-panel,
+            .filter-panel {
+                padding: 20px;
+
+                border-radius: 17px;
+            }
+
+
+            .search-row {
+                grid-template-columns: 1fr;
+            }
+
+
+            .primary-button {
+                width: 100%;
+            }
+
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+
+            .results-header {
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+
+            .results-title {
+                font-size: 25px;
+            }
+
+
+            .filter-actions {
+                flex-direction: column-reverse;
+
+                align-items: stretch;
+            }
+
+
+            .filter-button,
+            .secondary-button {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
+
+    <header class="hero">
+
+        <div class="hero-inner">
+
+            <div class="hero-badge">
+                🎵 Indian Music
+            </div>
+
+            <h1>
+                Discover Indian Music
+            </h1>
+
+            <p>
+                Find similar songs using your musical taste,
+                or browse traditional Indian music by language,
+                region and genre.
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <main class="container">
+
+
+        <!-- =================================================
+             SEARCH
+             ================================================= -->
+
+        <section class="search-panel">
+
+            <div class="section-heading">
+
+                <h2>
+                    Find a Song
+                </h2>
+
+                <p>
+                    Enter a song to discover similar music.
+                </p>
+
+            </div>
+
+
+            <form id="searchForm">
+
+                <div class="search-row">
+
+                    <input
+                        id="songSearch"
+                        class="search-input"
+                        type="text"
+                        autocomplete="off"
+                        placeholder="Enter song name..."
+                    >
+
+
+                    <button
+                        id="recommendButton"
+                        class="primary-button"
+                        type="submit"
+                    >
+                        Recommend
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <div
+                id="searchMessage"
+                class="search-helper"
+            >
+                You can also browse songs using the filters below.
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FILTERS
+             ================================================= -->
+
+        <section class="filter-panel">
+
+            <div class="section-heading">
+
+                <h2>
+                    Browse by Filters
+                </h2>
+
+                <p>
+                    Find songs without entering a song name.
+                </p>
+
+            </div>
+
+
+            <div class="filter-grid">
+
+
+                <div class="filter-field">
+
+                    <label for="languageFilter">
+                        Language
+                    </label>
+
+                    <select id="languageFilter">
+
+                        <option value="">
+                            All Languages
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-field">
+
+                    <label for="regionFilter">
+                        Region
+                    </label>
+
+                    <select id="regionFilter">
+
+                        <option value="">
+                            All Regions
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-field">
+
+                    <label for="genreFilter">
+                        Genre
+                    </label>
+
+                    <select id="genreFilter">
+
+                        <option value="">
+                            All Genres
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="filter-actions">
+
+                <button
+                    id="clearFiltersButton"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Clear
+                </button>
+
+
+                <button
+                    id="applyFiltersButton"
+                    class="filter-button"
+                    type="button"
+                >
+                    Apply Filters
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             RESULTS HEADER
+             ================================================= -->
+
+        <section>
+
+            <div class="results-header">
+
+                <h2
+                    id="resultsTitle"
+                    class="results-title"
+                >
+                    Recommended Songs
+                </h2>
+
+
+                <div
+                    id="resultsCount"
+                    class="results-count"
+                >
+                    0 songs
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 RESULTS
+                 ================================================= -->
+
+            <div
+                id="resultsGrid"
+                class="results-grid"
+            ></div>
+
+
+            <!-- =================================================
+                 EMPTY / LOADING / ERROR
+                 ================================================= -->
+
+            <div
+                id="stateBox"
+                class="state hidden"
+            >
+
+                <div
+                    id="stateIcon"
+                    class="state-icon"
+                >
+                    🎵
+                </div>
+
+                <h3 id="stateTitle">
+                    No songs found
+                </h3>
+
+                <p id="stateMessage">
+                    Try another search or change your filters.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
+
+    <footer>
+
+        <div>
+            <strong>
+                Indian Music Recommendation System
+            </strong>
+        </div>
+
+        <div>
+            Powered by TF-IDF and Cosine Similarity
+        </div>
+
+    </footer>
+
+
+    <script>
+
+        /* =====================================================
+           ELEMENTS
+           ===================================================== */
+
+        const searchForm =
+            document.getElementById(
+                "searchForm"
+            );
+
+
+        const songSearch =
+            document.getElementById(
+                "songSearch"
+            );
+
+
+        const recommendButton =
+            document.getElementById(
+                "recommendButton"
+            );
+
+
+        const searchMessage =
+            document.getElementById(
+                "searchMessage"
+            );
+
+
+        const languageFilter =
+            document.getElementById(
+                "languageFilter"
+            );
+
+
+        const regionFilter =
+            document.getElementById(
+                "regionFilter"
+            );
+
+
+        const genreFilter =
+            document.getElementById(
+                "genreFilter"
+            );
+
+
+        const applyFiltersButton =
+            document.getElementById(
+                "applyFiltersButton"
+            );
+
+
+        const clearFiltersButton =
+            document.getElementById(
+                "clearFiltersButton"
+            );
+
+
+        const resultsTitle =
+            document.getElementById(
+                "resultsTitle"
+            );
+
+
+        const resultsCount =
+            document.getElementById(
+                "resultsCount"
+            );
+
+
+        const resultsGrid =
+            document.getElementById(
+                "resultsGrid"
+            );
+
+
+        const stateBox =
+            document.getElementById(
+                "stateBox"
+            );
+
+
+        const stateIcon =
+            document.getElementById(
+                "stateIcon"
+            );
+
+
+        const stateTitle =
+            document.getElementById(
+                "stateTitle"
+            );
+
+
+        const stateMessage =
+            document.getElementById(
+                "stateMessage"
+            );
+
+
+        /* =====================================================
+           STATE
+           ===================================================== */
+
+        let requestNumber = 0;
+
+
+        /* =====================================================
+           SECURITY HELPERS
+           ===================================================== */
+
+        function escapeHtml(value) {
+
+            if (
+                value === null ||
+                value === undefined
+            ) {
+                return "";
+            }
+
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+
+        function escapeAttribute(value) {
+
+            return escapeHtml(value);
+        }
+
+
+        /* =====================================================
+           URL HELPERS
+           ===================================================== */
+
+        function buildYoutubeSearchUrl(song) {
+
+            const query = [
+                song.song_name,
+                song.artist,
+                song.language,
+                "song"
+            ]
+                .filter(Boolean)
+                .join(" ");
+
+            return (
+                "https://www.youtube.com/results?search_query=" +
+                encodeURIComponent(query)
+            );
+        }
+
+
+        function buildSpotifySearchUrl(song) {
+
+            const query = [
+                song.song_name,
+                song.artist
+            ]
+                .filter(Boolean)
+                .join(" ");
+
+            return (
+                "https://open.spotify.com/search/" +
+                encodeURIComponent(query)
+            );
+        }
+
+
+        /* =====================================================
+           SOURCE BUTTONS
+           ===================================================== */
+
+        function createSourceButtons(song) {
+
+            let html = "";
+
+
+            /*
+             * If dataset contains a direct Spotify URL,
+             * use it.
+             */
+
+            if (
+                song.spotify_url &&
+                String(song.spotify_url).trim()
+            ) {
+
+                html += `
+
+                    <a
+                        class="song-action spotify-button"
+                        href="${escapeAttribute(
+                            song.spotify_url
+                        )}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+
+                        <span class="action-icon">
+                            🎧
+                        </span>
+
+                        Spotify
+
+                    </a>
+
+                `;
+
+            } else {
+
+                /*
+                 * No direct Spotify reference.
+                 * Give user a Spotify search instead.
+                 */
+
+                html += `
+
+                    <a
+                        class="song-action search-button"
+                        href="${escapeAttribute(
+                            buildSpotifySearchUrl(song)
+                        )}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+
+                        <span class="action-icon">
+                            🔎
+                        </span>
+
+                        Search Spotify
+
+                    </a>
+
+                `;
+
+            }
+
+
+            /*
+             * If dataset contains a direct YouTube URL,
+             * use it.
+             */
+
+            if (
+                song.youtube_url &&
+                String(song.youtube_url).trim()
+            ) {
+
+                html += `
+
+                    <a
+                        class="song-action youtube-button"
+                        href="${escapeAttribute(
+                            song.youtube_url
+                        )}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+
+                        <span class="action-icon">
+                            ▶
+                        </span>
+
+                        YouTube
+
+                    </a>
+
+                `;
+
+            } else {
+
+                /*
+                 * No direct YouTube reference.
+                 * Give user a YouTube search.
+                 */
+
+                html += `
+
+                    <a
+                        class="song-action search-button"
+                        href="${escapeAttribute(
+                            buildYoutubeSearchUrl(song)
+                        )}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+
+                        <span class="action-icon">
+                            🔎
+                        </span>
+
+                        Search YouTube
+
+                    </a>
+
+                `;
+
+            }
+
+
+            return html;
+        }
+
+
+        /* =====================================================
+           STATE DISPLAY
+           ===================================================== */
+
+        function hideState() {
+
+            stateBox.classList.add(
+                "hidden"
+            );
+        }
+
+
+        function showState(
+            icon,
+            title,
+            message
+        ) {
+
+            stateIcon.textContent = icon;
+
+            stateTitle.textContent = title;
+
+            stateMessage.textContent =
+                message;
+
+            stateBox.classList.remove(
+                "hidden"
+            );
+        }
+
+
+        /* =====================================================
+           LOADING
+           ===================================================== */
+
+        function showLoading() {
+
+            resultsGrid.innerHTML = "";
+
+            showState(
+                "⏳",
+                "Finding songs...",
+                "Please wait while we load your results."
+            );
+        }
+
+
+        /* =====================================================
+           ERROR
+           ===================================================== */
+
+        function showError(message) {
+
+            resultsGrid.innerHTML = "";
+
+            showState(
+                "⚠️",
+                "Something went wrong",
+                message
+            );
+        }
+
+
+        /* =====================================================
+           CREATE SONG CARD
+           ===================================================== */
+
+        function createSongCard(
+            song,
+            isRecommendation = false
+        ) {
+
+            const card =
+                document.createElement(
+                    "article"
+                );
+
+
+            card.className =
+                "song-card";
+
+
+            const image =
+                song.cover_image ||
+                "/static/images/folk-music.svg";
+
+
+            let similarityHtml = "";
+
+
+            /*
+             * Similarity is meaningful only for
+             * recommendation results.
+             */
+
+            if (
+                isRecommendation &&
+                song.similarity !== null &&
+                song.similarity !== undefined &&
+                !Number.isNaN(
+                    Number(song.similarity)
+                )
+            ) {
+
+                const percentage =
+                    (
+                        Number(
+                            song.similarity
+                        ) * 100
+                    ).toFixed(1);
+
+
+                similarityHtml = `
+
+                    <span class="similarity-value">
+
+                        Similarity:
+
+                        <strong>
+                            ${percentage}%
+                        </strong>
+
+                    </span>
+
+                `;
+
+            }
+
+
+            let yearHtml = "";
+
+
+            if (
+                song.year !== null &&
+                song.year !== undefined &&
+                !Number.isNaN(
+                    Number(song.year)
+                )
+            ) {
+
+                yearHtml = `
+
+                    <span class="meta-item">
+                        ${Math.round(
+                            Number(song.year)
+                        )}
+                    </span>
+
+                `;
+
+            }
+
+
+            let albumHtml = "";
+
+
+            if (
+                song.album &&
+                String(song.album).trim()
+            ) {
+
+                albumHtml = `
+
+                    <p class="album-name">
+
+                        ${escapeHtml(
+                            song.album
+                        )}
+
+                    </p>
+
+                `;
+
+            }
+
+
+            const sourceButtons =
+                createSourceButtons(
+                    song
+                );
+
+
+            card.innerHTML = `
+
+                <div class="song-cover-wrapper">
+
+                    <img
+                        class="song-cover"
+                        src="${escapeAttribute(
+                            image
+                        )}"
+                        alt="${escapeAttribute(
+                            song.song_name ||
+                            "Song cover"
+                        )}"
+                        loading="lazy"
+
+                        onerror="
+                            this.onerror = null;
+                            this.src =
+                            '/static/images/folk-music.svg';
+                        "
+                    >
+
+                </div>
+
+
+                <div class="song-info">
+
+                    <h3 class="song-title">
+
+                        ${escapeHtml(
+                            song.song_name ||
+                            "Unknown Song"
+                        )}
+
+                    </h3>
+
+
+                    <p class="artist">
+
+                        ${escapeHtml(
+                            song.artist ||
+                            "Traditional / Folk"
+                        )}
+
+                    </p>
+
+
+                    ${albumHtml}
+
+
+                    <div class="tags">
+
+                        ${
+                            song.language
+                            ? `
+                                <span class="tag">
+                                    ${escapeHtml(
+                                        song.language
+                                    )}
+                                </span>
+                            `
+                            : ""
+                        }
+
+
+                        ${
+                            song.genre
+                            ? `
+                                <span class="tag">
+                                    ${escapeHtml(
+                                        song.genre
+                                    )}
+                                </span>
+                            `
+                            : ""
+                        }
+
+
+                        ${
+                            song.region_group
+                            ? `
+                                <span class="tag">
+                                    ${escapeHtml(
+                                        song.region_group
+                                    )}
+                                </span>
+                            `
+                            : ""
+                        }
+
+                    </div>
+
+
+                    ${
+                        similarityHtml ||
+                        yearHtml
+                        ? `
+
+                            <div class="song-meta">
+
+                                ${similarityHtml}
+
+                                ${yearHtml}
+
+                            </div>
+
+                        `
+                        : ""
+                    }
+
+
+                    <div class="song-actions">
+
+                        ${sourceButtons}
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            return card;
+        }
+
+
+        /* =====================================================
+           RENDER RESULTS
+           ===================================================== */
+
+        function renderResults(
+            songs,
+            options = {}
+        ) {
+
+            const {
+                recommendation = false,
+                title = "Recommended Songs"
+            } = options;
+
+
+            resultsGrid.innerHTML = "";
+
+            hideState();
+
+
+            resultsTitle.textContent =
+                title;
+
+
+            resultsCount.textContent =
+                `${songs.length} ${
+                    songs.length === 1
+                    ? "song"
+                    : "songs"
+                }`;
+
+
+            if (!songs.length) {
+
+                showState(
+                    "🔎",
+                    "No songs found",
+                    recommendation
+                        ? "Try another song or remove some filters."
+                        : "Try different filter combinations."
+                );
+
+                return;
+            }
+
+
+            const fragment =
+                document.createDocumentFragment();
+
+
+            songs.forEach(
+                song => {
+
+                    fragment.appendChild(
+                        createSongCard(
+                            song,
+                            recommendation
+                        )
+                    );
+
+                }
+            );
+
+
+            resultsGrid.appendChild(
+                fragment
+            );
+        }
+
+
+        /* =====================================================
+           FETCH JSON
+           ===================================================== */
+
+        async function fetchJson(url) {
+
+            const response =
+                await fetch(url);
+
+
+            const text =
+                await response.text();
+
+
+            let data;
+
+
+            try {
+
+                data =
+                    JSON.parse(text);
+
+            } catch (error) {
+
+                throw new Error(
+                    "The server returned invalid JSON."
+                );
+            }
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Request failed."
+                );
+            }
+
+
+            return data;
+        }
+
+
+        /* =====================================================
+           LOAD FILTER OPTIONS
+           ===================================================== */
+
+        async function loadFilters() {
+
+            try {
+
+                const data =
+                    await fetchJson(
+                        "/api/filters"
+                    );
+
+
+                fillSelect(
+                    languageFilter,
+                    data.languages ||
+                    [],
+                    "All Languages"
+                );
+
+
+                fillSelect(
+                    regionFilter,
+                    data.regions ||
+                    [],
+                    "All Regions"
+                );
+
+
+                fillSelect(
+                    genreFilter,
+                    data.genres ||
+                    [],
+                    "All Genres"
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Filter loading error:",
+                    error
+                );
+
+                showError(
+                    "Unable to load filter options. Please refresh the page."
+                );
+
+            }
+        }
+
+
+        /* =====================================================
+           FILL SELECT
+           ===================================================== */
+
+        function fillSelect(
+            select,
+            values,
+            defaultText
+        ) {
+
+            select.innerHTML = "";
+
+
+            const defaultOption =
+                document.createElement(
+                    "option"
+                );
+
+
+            defaultOption.value = "";
+
+            defaultOption.textContent =
+                defaultText;
+
+
+            select.appendChild(
+                defaultOption
+            );
+
+
+            values.forEach(
+                value => {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+
+                    option.value = value;
+
+                    option.textContent =
+                        value;
+
+
+                    select.appendChild(
+                        option
+                    );
+
+                }
+            );
+        }
+
+
+        /* =====================================================
+           GET CURRENT FILTERS
+           ===================================================== */
+
+        function getFilters() {
+
+            return {
+
+                language:
+                    languageFilter.value,
+
+                region_group:
+                    regionFilter.value,
+
+                genre:
+                    genreFilter.value
+
+            };
+        }
+
+
+        /* =====================================================
+           BUILD QUERY STRING
+           ===================================================== */
+
+        function buildFilterQuery() {
+
+            const filters =
+                getFilters();
+
+
+            const params =
+                new URLSearchParams();
+
+
+            if (filters.language) {
+
+                params.set(
+                    "language",
+                    filters.language
+                );
+
+            }
+
+
+            if (filters.region_group) {
+
+                params.set(
+                    "region_group",
+                    filters.region_group
+                );
+
+            }
+
+
+            if (filters.genre) {
+
+                params.set(
+                    "genre",
+                    filters.genre
+                );
+
+            }
+
+
+            params.set(
+                "limit",
+                "50"
+            );
+
+
+            return params.toString();
+        }
+
+
+        /* =====================================================
+           BROWSE BY FILTERS
+           ===================================================== */
+
+        async function browseByFilters() {
+
+            const currentRequest =
+                ++requestNumber;
+
+
+            showLoading();
+
+
+            try {
+
+                const query =
+                    buildFilterQuery();
+
+
+                const data =
+                    await fetchJson(
+                        `/api/songs?${query}`
+                    );
+
+
+                /*
+                 * Ignore old response if user
+                 * already made another request.
+                 */
+
+                if (
+                    currentRequest !==
+                    requestNumber
+                ) {
+                    return;
+                }
+
+
+                const filters =
+                    getFilters();
+
+
+                const active =
+                    [
+                        filters.language,
+                        filters.region_group,
+                        filters.genre
+                    ].filter(Boolean);
+
+
+                let title =
+                    "Songs Matching Your Filters";
+
+
+                if (!active.length) {
+
+                    title =
+                        "Browse Indian Songs";
+
+                }
+
+
+                renderResults(
+                    data.songs || [],
+                    {
+                        recommendation: false,
+                        title: title
+                    }
+                );
+
+
+                searchMessage.textContent =
+                    active.length
+                    ? "Showing songs matching your selected filters."
+                    : "Showing songs from the dataset.";
+
+            } catch (error) {
+
+                if (
+                    currentRequest !==
+                    requestNumber
+                ) {
+                    return;
+                }
+
+
+                console.error(
+                    "Filter request error:",
+                    error
+                );
+
+
+                showError(
+                    error.message ||
+                    "Unable to load songs."
+                );
+            }
+        }
+
+
+        /* =====================================================
+           RECOMMEND SONGS
+           ===================================================== */
+
+        async function recommendSongs() {
+
+            const song =
+                songSearch.value.trim();
+
+
+            /*
+             * Empty search:
+             * Instead of doing an invalid recommendation,
+             * use the filters as a browse request.
+             */
+
+            if (!song) {
+
+                await browseByFilters();
+
+                return;
+            }
+
+
+            const currentRequest =
+                ++requestNumber;
+
+
+            showLoading();
+
+
+            recommendButton.disabled =
+                true;
+
+
+            recommendButton.textContent =
+                "Finding...";
+
+
+            try {
+
+                const params =
+                    new URLSearchParams();
+
+
+                params.set(
+                    "song",
+                    song
+                );
+
+
+                const filters =
+                    getFilters();
+
+
+                if (filters.language) {
+
+                    params.set(
+                        "language",
+                        filters.language
+                    );
+
+                }
+
+
+                if (filters.region_group) {
+
+                    params.set(
+                        "region_group",
+                        filters.region_group
+                    );
+
+                }
+
+
+                if (filters.genre) {
+
+                    params.set(
+                        "genre",
+                        filters.genre
+                    );
+
+                }
+
+
+                params.set(
+                    "limit",
+                    "10"
+                );
+
+
+                const data =
+                    await fetchJson(
+                        `/api/recommend?${params.toString()}`
+                    );
+
+
+                if (
+                    currentRequest !==
+                    requestNumber
+                ) {
+                    return;
+                }
+
+
+                renderResults(
+                    data.recommendations ||
+                    [],
+                    {
+                        recommendation: true,
+                        title:
+                            `Recommendations for "${song}"`
+                    }
+                );
+
+
+                searchMessage.textContent =
+                    `Recommendations based on "${song}".`;
+
+            } catch (error) {
+
+                if (
+                    currentRequest !==
+                    requestNumber
+                ) {
+                    return;
+                }
+
+
+                console.error(
+                    "Recommendation error:",
+                    error
+                );
+
+
+                showError(
+                    error.message ||
+                    "Unable to generate recommendations."
+                );
+
+            } finally {
+
+                recommendButton.disabled =
+                    false;
+
+                recommendButton.textContent =
+                    "Recommend";
+            }
+        }
+
+
+        /* =====================================================
+           SEARCH FORM
+           ===================================================== */
+
+        searchForm.addEventListener(
+            "submit",
+            function(event) {
+
+                event.preventDefault();
+
+                recommendSongs();
+
+            }
+        );
+
+
+        /* =====================================================
+           APPLY FILTERS
+           ===================================================== */
+
+        applyFiltersButton.addEventListener(
+            "click",
+            function() {
+
+                /*
+                 * If a song is entered, filters will be used
+                 * with recommendation.
+                 *
+                 * If no song is entered, filters directly
+                 * browse the dataset.
+                 */
+
+                if (
+                    songSearch.value.trim()
+                ) {
+
+                    recommendSongs();
+
+                } else {
+
+                    browseByFilters();
+
+                }
+
+            }
+        );
+
+
+        /* =====================================================
+           CLEAR FILTERS
+           ===================================================== */
+
+        clearFiltersButton.addEventListener(
+            "click",
+            function() {
+
+                languageFilter.value = "";
+
+                regionFilter.value = "";
+
+                genreFilter.value = "";
+
+                songSearch.value = "";
+
+
+                browseByFilters();
+
+            }
+        );
+
+
+        /* =====================================================
+           INITIAL LOAD
+           ===================================================== */
+
+        async function initialize() {
+
+            await loadFilters();
+
+            await browseByFilters();
+
+        }
+
+
+        initialize();
+
+    </script>
+
+</body>
+
+</html>

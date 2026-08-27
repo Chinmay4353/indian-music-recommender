@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+    <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#5b21b6"/>
+            <stop offset="100%" stop-color="#ec4899"/>
+        </linearGradient>
+    </defs>
+
+    <rect width="600" height="600" fill="url(#bg)"/>
+
+    <circle
+        cx="300"
+        cy="245"
+        r="125"
+        fill="rgba(255,255,255,0.15)"
+    />
+
+    <text
+        x="300"
+        y="270"
+        text-anchor="middle"
+        font-size="120"
+        fill="white"
+    >
+        ♪
+    </text>
+
+    <text
+        x="300"
+        y="410"
+        text-anchor="middle"
+        font-family="Arial, sans-serif"
+        font-size="38"
+        font-weight="bold"
+        fill="white"
+    >
+        Marathi Folk
+    </text>
+
+    <text
+        x="300"
+        y="455"
+        text-anchor="middle"
+        font-family="Arial, sans-serif"
+        font-size="24"
+        fill="white"
+    >
+        लोकसंगीत
+    </text>
+</svg>
