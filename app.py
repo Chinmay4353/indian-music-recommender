@@ -298,6 +298,126 @@ def server_error(error):
     return jsonify({
         "error": "Internal server error."
     }), 500
+    
+# ============================================================
+# SONG AUTOCOMPLETE / SEARCH SUGGESTIONS
+# ============================================================
+
+@app.route("/api/suggestions", methods=["GET"])
+def song_suggestions():
+    """
+    Return song-name suggestions from the actual dataset.
+
+    This endpoint is ONLY for autocomplete.
+    It does NOT generate recommendations.
+    """
+
+    query = request.args.get("q", "").strip()
+
+    # Do not search for empty/very short input
+    if len(query) < 2:
+        return jsonify({
+            "suggestions": []
+        })
+
+    try:
+        # Reuse the dataframe already loaded by the application
+        df = songs_df
+
+        if df is None or df.empty:
+            return jsonify({
+                "suggestions": []
+            })
+
+        # Make sure the required column exists
+        if "song_name" not in df.columns:
+            return jsonify({
+                "error": "song_name column not found in dataset."
+            }), 500
+
+        # Work on a copy so the original dataframe is never modified
+        search_df = df.copy()
+
+        search_df["song_name_search"] = (
+            search_df["song_name"]
+            .fillna("")
+            .astype(str)
+            .str.strip()
+        )
+
+        query_lower = query.casefold()
+
+        # --------------------------------------------------------
+        # Match priority
+        # 1. Starts with query
+        # 2. Contains query
+        # --------------------------------------------------------
+
+        starts_with = search_df[
+            search_df["song_name_search"]
+            .str.casefold()
+            .str.startswith(query_lower, na=False)
+        ]
+
+        contains = search_df[
+            search_df["song_name_search"]
+            .str.casefold()
+            .str.contains(
+                query_lower,
+                regex=False,
+                na=False
+            )
+        ]
+
+        # Combine while preserving priority
+        matched = pd.concat(
+            [starts_with, contains]
+        ).drop_duplicates(
+            subset=["song_name_search"]
+        )
+
+        # Limit suggestions
+        matched = matched.head(8)
+
+        suggestions = []
+
+        for _, row in matched.iterrows():
+
+            song_name = str(
+                row.get("song_name", "")
+            ).strip()
+
+            if not song_name:
+                continue
+
+            artist = row.get("artist", "")
+            language = row.get("language", "")
+
+            if pd.isna(artist):
+                artist = ""
+
+            if pd.isna(language):
+                language = ""
+
+            suggestions.append({
+                "song_name": song_name,
+                "artist": str(artist).strip(),
+                "language": str(language).strip()
+            })
+
+        return jsonify({
+            "suggestions": suggestions
+        })
+
+    except Exception as error:
+
+        app.logger.exception(
+            "Song suggestion error"
+        )
+
+        return jsonify({
+            "error": "Unable to load song suggestions."
+        }), 500
 
 
 # ============================================================
